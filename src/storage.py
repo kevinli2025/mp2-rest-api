@@ -34,7 +34,7 @@ class DatasetStorage:
         df = self._store[dataset_id]["data"]
 
         metadata = {
-            "id:": dataset_id,
+            "id": dataset_id,
             "filename": self._store[dataset_id]["filename"],
             "rows": df.shape[0],
             "columns": df.shape[1],

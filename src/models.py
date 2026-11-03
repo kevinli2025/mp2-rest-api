@@ -10,5 +10,5 @@ class DatasetInfo(BaseModel):
     id: int
     filename: str
     rows: int
-    coumns: int
+    columns: int
     column_names: list[str]
