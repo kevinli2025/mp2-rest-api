@@ -17,8 +17,9 @@ async def log_requests(request: Request, call_next):
     try:
         response = await call_next(request)
     except Exception:
-        # TODO 1: Log the unexpected exception at ERROR with exc_info=True.
-        # Include the request ID. Do not expose exception details to the client.
+        logger.error(
+            f"request_id={request_id} Unexpected exception", exc_info=True
+        )
         response = JSONResponse(
             status_code=500,
             content={"detail": "Internal server error"}
@@ -26,10 +27,16 @@ async def log_requests(request: Request, call_next):
 
     duration_ms = (time.perf_counter() - started) * 1000
 
-    # TODO 2: Build a message containing request_id, request.method,
-    # request.url.path, response.status_code, and duration_ms.
-    # TODO 3: Log that message at ERROR for 5xx, WARNING for 4xx,
-    # and INFO for other responses.
+    message = (
+        f"request_id={request_id} {request.method} {request.url.path} "
+        f"status={response.status_code} duration={duration_ms:.1f}ms"
+    )
+    if response.status_code >= 500:
+        logger.error(message)
+    elif response.status_code >= 400:
+        logger.warning(message)
+    else:
+        logger.info(message)
 
     response.headers["X-Request-ID"] = request_id
     return response
