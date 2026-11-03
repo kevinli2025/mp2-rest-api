@@ -4,7 +4,8 @@ import logging
 from pathlib import Path
 import pandas as pd
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
-from src import DatasetInfo, DatasetStorage, HealthResponse, setup_logging
+from src import DatasetInfo, DatasetStorage, HealthResponse, setup_logging, ProcessConfig, ProcessingReport
+from data_pipeline import create_cleaning_report, process_data, validate_dataframe
 
 setup_logging(verbose=True)
 logger = logging.getLogger(__name__)
@@ -54,3 +55,12 @@ def get_dataset(dataset_id: int, limit: int = Query(default=100, ge=1)):
     records = json.loads(dataset.head(limit).to_json(orient="records"))
     logger.info(f"Retrieved dataset: id={dataset_id}, rows={len(records)}")
     return {"id": dataset_id, "data": records, "total_rows": len(dataset)}
+
+@app.post(
+    "/datasets/{dataset_id}/process",
+    response_model=ProcessingReport
+)
+def process_dataset(dataset_id: int, config: ProcessConfig):
+    """Validate and process a stored dataset using MP1 functions."""
+    # TODO: retrieve, validate, process, report, update, and return.
+    pass
